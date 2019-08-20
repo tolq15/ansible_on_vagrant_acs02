@@ -1,0 +1,18 @@
+---
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+
+  tasks:
+  - name: Create user and private/public keys
+    user:
+      name: tolq15
+      password: '$6$wVvt03646R/7xVNf$GfkvP./4xqgbDD.laJ39dXr7Ladg28NsofMEFUh0IQgOqauJT0lVkdXUnhgJOfeih5D8PpuewV2cj4Mh3fveh/' # lt_215
+      groups:
+       - postgres
+       - sudo
+      generate_ssh_key: yes
+      ssh_key_bits: 2048
+      ssh_key_comment: "ansible-generated for tolq15@{{ ansible_hostname }}"

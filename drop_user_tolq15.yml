@@ -1,0 +1,14 @@
+---
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  gather_facts: no
+
+  tasks:
+  - name: Drop user and private/public keys
+    user:
+      name: tolq15
+      state: absent
+      remove: yes
+

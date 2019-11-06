@@ -1,0 +1,8 @@
+---
+
+- name: Drop/create/setup users
+  hosts: all
+  remote_user: vagrant
+  become: yes
+  roles:
+    - manage_users

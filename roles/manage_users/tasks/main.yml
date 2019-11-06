@@ -1,0 +1,26 @@
+---
+
+#  tasks:
+- name: Drop user and private/public keys
+  user:
+    name: "{{ item }}"
+    state: absent
+    remove: yes
+  with_items: "{{ the_users }}"
+  tags:
+    - delete_user
+
+- name: Create user and private/public keys
+  user:
+    name: "{{ item }}"
+    password: '$6$wVvt03646R/7xVNf$GfkvP./4xqgbDD.laJ39dXr7Ladg28NsofMEFUh0IQgOqauJT0lVkdXUnhgJOfeih5D8PpuewV2cj4Mh3fveh/' # lt_215
+    groups:
+      - postgres
+      - sudo
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_comment: "ansible-generated for {{ item }}@{{ ansible_hostname }}"
+  with_items: "{{ the_users }}"
+  tags:
+    - create_user
+

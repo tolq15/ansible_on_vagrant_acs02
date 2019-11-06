@@ -8,8 +8,11 @@
   tasks:
   - name: Drop user and private/public keys
     user:
-      name: {{ item }}
+      name: "{{ item }}"
       state: absent
       remove: yes
-    with_items: the_users
+    with_items:
+      - tolq16
+      - postgres01
+
 

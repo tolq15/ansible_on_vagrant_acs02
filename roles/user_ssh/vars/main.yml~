@@ -1,0 +1,10 @@
+---
+# vars file for user_ssh
+
+ssh_users:
+  - tolq16
+  - postgres01
+
+tolq16_password:     '$6$wVvt03646R/7xVNf$GfkvP./4xqgbDD.laJ39dXr7Ladg28NsofMEFUh0IQgOqauJT0lVkdXUnhgJOfeih5D8PpuewV2cj4Mh3fveh/' # lt_215
+postgres01_password: '$6$EcSZ1rIyfWqcQK$Jw0gUYcHDTBNz9.NeXW.PjLm1TwuPheM5IDw0D6oZzGdEkvPkQqXDkBEr3Azpteu8sCl/BS0LUbVicHk7IYVC/'   # postgres01
+  

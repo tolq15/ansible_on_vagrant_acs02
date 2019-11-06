@@ -1,0 +1,15 @@
+---
+
+#- hosts: all
+#  become: yes
+#  become_method: sudo
+#  gather_facts: no
+
+#tasks:
+- name: Drop user and private/public keys
+  user:
+    name: "{{ item }}"
+    state: absent
+    remove: yes
+  with_items: the_users
+

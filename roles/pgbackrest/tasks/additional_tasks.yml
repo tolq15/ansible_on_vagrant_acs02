@@ -1,0 +1,53 @@
+- name: execute the first backup
+  command: pgbackrest backup --stanza {{ item.key }}
+  become: yes
+  become_user: "{{ pg_osuser }}"
+  args:
+    creates: "{{ pg_backrest.repository }}/backup/{{ item.key }}/latest"
+  when: inventory_hostname in groups['bckserver']
+  with_dict: "{{ pg_clusters }}"
+
+- name: Start the postgresql service on the secondary
+  service:
+    name: postgresql
+    state: started
+  when: inventory_hostname == pg_backrest.secondary
+
+# LT: restore_secondary.yml is not defined
+- name: restore the backup on the secondary
+  include: restore_secondary.yml
+  with_dict: "{{ pg_clusters }}"
+  when: inventory_hostname == pg_backrest.secondary
+  loopcontrol:
+    loopvar: db_cluster
+
+# LT: run_backup.sh.j2 is not defined
+- name: deploy run_backup
+  template:
+    src: run_backup.sh.j2
+    dest:  "{{ pg_home_dir }}/run_backup.sh"
+    owner: "{{ pg_osuser }}"
+    group: "{{ pg_osgroup }}"
+    mode:  0700
+  when: inventory_hostname in groups['bckserver']
+
+# LT: logrotate_pgbackrest.j2 is not defined
+- name: Ship the log rotate configuration for pgbackrest to the backup server
+  template:
+    src: logrotate_pgbackrest.j2
+    dest:  "{{ logrotate_pgbackrest }}"
+    owner: "root"
+    group: "{{ pg_osgroup }}"
+    mode:  0644
+  when: inventory_hostname in groups['bckserver']
+
+# LT: test_restore.sh.j2 is not defined
+- name: deploy test_restore
+  template:
+    src: test_restore.sh.j2
+    dest:  "{{ pg_home_dir }}/test_restore.sh"
+    owner: "{{ pg_osuser }}"
+    group: "{{ pg_osgroup }}"
+    mode:  0700
+  when:inventory_hostname in groups['rstserver']
+

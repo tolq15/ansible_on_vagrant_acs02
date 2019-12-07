@@ -1,0 +1,15 @@
+[global]
+repo-path=/pg_backrest/
+log-level-console=error
+log-level-file=info
+log-path=/pg_backrest//logs/
+repo1-retention-full=1
+
+[tron]
+pg1-path=/pg_data/11/tron
+pg1-host-user=postgres
+pg1-port=5432
+pg1-host=db01
+pg2-host-user=postgres
+pg2-port=5432
+pg2-host=db02

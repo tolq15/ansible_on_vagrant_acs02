@@ -1,0 +1,13 @@
+---
+
+- hosts: all
+  become: yes
+  gather_facts: false
+
+  tasks:
+  - name: uninstall common packages
+    apt:
+      name: pgbackrest
+      state: absent
+      update_cache: yes
+      cache_valid_time: 86400

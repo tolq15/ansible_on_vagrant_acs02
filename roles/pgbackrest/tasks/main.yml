@@ -1,0 +1,83 @@
+---
+
+- name: install common packages
+  apt:
+    name: pgbackrest
+    update_cache: yes
+    cache_valid_time: 86400
+
+- name: Build the list of the PostgreSQL defined ports
+  set_fact:
+    pg_ports: "{{ pg_ports | default([]) + [item.value.params.port] }}"
+  with_dict: "{{ pg_clusters }}"
+
+- name: Check that port is unique with in the clusters
+  assert:
+    that: >
+           pg_ports | count
+           ==
+           pg_ports | unique | count
+    msg: "Duplicated port detected in the cluster definition. ,,,,"
+
+- name: Ship the custom pgbackrest.conf in conf.d
+  template:
+    src: postgresql_pgbackrest.conf.j2
+    dest: "/var/lib/postgresql/{{item.value.version}}/{{item.key}}/conf.d/99postgresql_pgbackrest.conf"
+    owner: "{{ pg_osuser }}"
+    group: "{{ pg_osgroup }}"
+    mode: 0644
+    backup: yes
+  when: inventory_hostname in groups['dbservers']
+  with_dict: "{{ pg_clusters}}"
+
+- name: create the pgbackrest directory for repository
+  file:
+    path:  "{{ pg_backrest.repository }}/backup"
+    owner: "{{ pg_osuser }}"
+    group: "{{ pg_osgroup }}"
+    state: directory
+    mode:  0700
+  when: inventory_hostname in groups['pgsql']
+
+- name: create the pgbackrest log directory
+  file:
+    path:  "{{ pg_backrest.repository }}/logs"
+    owner: "{{ pg_osuser }}"
+    group: "{{ pg_osgroup }}"
+    state: directory
+    mode:  0700
+  when: inventory_hostname in groups['pgsql']
+
+- name: deploy pgbackrest.conf on backup server
+  template:
+    src:    pgbackrest_backup_server.conf.j2
+    dest:   "{{ pg_backrest.repository }}/pgbackrest.conf"   #"{{ pgbackrest_conf }}"
+    owner:  "{{ pg_osuser }}"
+    group:  "{{ pg_osgroup }}"
+    mode:   0644
+    backup: true
+  when: inventory_hostname in groups['bckserver']
+  with_dict: "{{ pg_clusters }}"
+
+- name: deploy pgbackrest.conf on database server
+  template:
+    src:    pgbackrest_db_server.conf.j2
+    dest:   "{{ pg_backrest.repository }}/pgbackrest.conf"   #"{{ pgbackrest_conf }}"
+    owner:  "{{ pg_osuser }}"
+    group:  "{{ pg_osgroup }}"
+    mode:   0644
+    backup: true
+  when: inventory_hostname in groups['dbservers']
+  with_dict: "{{ pg_clusters }}"
+
+- name: create stanzas on the backup server
+  command: pgbackrest stanza-create --stanza={{item.key}} --log-level-console=info --config=/pgbackrest/repl_01/pgbackrest.conf
+  become: true
+  become_user: "{{ pg_osuser }}"
+  args:
+    creates: "{{ pg_backrest.repository }}/{{ item.key }}/backup"
+  when: inventory_hostname in groups['bckserver']
+  with_dict: "{{ pg_clusters }}"
+
+# LT: when and if it is needed
+#- import_tasks: additional_tasks.yml

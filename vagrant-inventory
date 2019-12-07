@@ -1,5 +1,26 @@
-[anxs]
+[hosts]
+acs02
+web02
+db02
+bck02
+
+[dbservers]
 acs02
 web02
 db02
 
+[bckserver]
+bck02
+
+[pgsql:children]
+dbservers
+bckserver
+
+[apt:children]
+pgsql
+
+[ssh:children]
+hosts
+
+[pgbackrest:children]
+pgsql

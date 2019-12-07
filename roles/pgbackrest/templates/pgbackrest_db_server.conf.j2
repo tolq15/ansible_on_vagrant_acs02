@@ -1,0 +1,10 @@
+[global]
+backup-host="{{ pg_backrest.backup_server }}"
+backup-user="{{ pg_osuser }}"
+log-level-console=error
+log-level-file=error
+
+[repl_01]
+pg1-path=/var/lib/postgresql/11/repl_01
+log-path=/pgbackrest/repl_01/log
+pg1-port=5432

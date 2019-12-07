@@ -1,0 +1,36 @@
+pg_super_user: "postgres"
+pg_osuser:     "postgres"
+pg_osgroup:    "postgres"
+# LT: See directory ~/dynamic_duo for clone
+# pg_super_password: !vault|
+log_rotate_pgsql:  "/etc/logrotate.d/pgsql_custom"
+
+pg_dirs:
+  data_area:     "/var/lib/postgresql"
+  log_directory: "/var/log/postgresql"
+  wal_area:      "/var/lib/postgresql/pg_wal"
+
+log_rotate:
+  mode: "weekly"
+  keep: "10"
+
+pg_clusters:
+  repl_01:
+    pg_dirs:
+      data_area:     "/var/lib/postgresql/11/repl_01"
+      log_directory: "/var/log/postgresql"
+    version: "11"
+    params:
+      port: "5432"
+      listen_addresses: "*"
+    log_rotate:
+      mode: "daily"
+      keep: "31"
+
+pg_backrest:
+  backup_server: bck02
+  primary:       acs02
+  secondary:     db02
+  repository:    /pgbackrest/repl_01
+  recovery_option:
+    - "standby_mode=on"

@@ -1,0 +1,11 @@
+[global]
+backup-host=backupsrv
+backup-user=postgres
+log-level-console=error
+log-level-file=error
+
+[tron]
+pg1-path=/pg_data/11/tron
+pg1-port=5432
+recovery-option=standby_mode=on
+log-path=/pg_log/11/tron/
